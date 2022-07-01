@@ -1,0 +1,12 @@
+diff --git a/sim/arm/arminit.c b/arm/arminit.c
+index 851d356..10fb45b 100644
+--- a/sim/arm/arminit.c
++++ b/sim/arm/arminit.c
+@@ -39,6 +39,7 @@ unsigned ARMul_MultTable[32] =
+ };
+ ARMword ARMul_ImmedTable[4096];	/* immediate DP LHS values */
+ char ARMul_BitList[256];	/* number of bits in a byte table */
++ARMword isize;
+ 
+ /***************************************************************************\
+ *         Call this routine once to set up the emulator's tables.           *

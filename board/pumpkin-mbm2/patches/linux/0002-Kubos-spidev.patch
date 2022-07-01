@@ -1,0 +1,12 @@
+diff --git a/drivers/spi/spidev.c b/drivers/spi/spidev.c
+index 2c72729..fc1525f 100644
+--- a/drivers/spi/spidev.c
++++ b/drivers/spi/spidev.c
+@@ -677,6 +677,7 @@ static struct class *spidev_class;
+ static const struct of_device_id spidev_dt_ids[] = {
+ 	{ .compatible = "rohm,dh2228fv" },
+ 	{ .compatible = "lineartechnology,ltc2488" },
++    { .compatible = "spidev" },
+ 	{ .compatible = "ge,achc" },
+ 	{ .compatible = "semtech,sx1301" },
+ 	{ .compatible = "lwn,bk4" },

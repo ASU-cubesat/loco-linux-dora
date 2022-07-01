@@ -1,0 +1,21 @@
+config BR2_PACKAGE_SPARCS_PLP_RUST
+    bool "sparcs-plp-rust"
+    help
+        Build and include the sparcs-plp-rust binaries (only works on BBB)
+
+        http://example.com
+
+#if BR2_PACKAGE_SPARCS_PLP_RUST
+#choice
+
+config BR2_PACKAGE_SPARCS_PLP_RUST_REPO_URL
+        string "URL of git repository"
+        depends on BR2_PACKAGE_SPARCS_PLP_RUST
+
+config BR2_PACKAGE_SPARCS_PLP_RUST_REPO_VERSION
+        string "Git repository version"
+        help
+          Revision to use in the typical format used by
+          git, e.g. a tag, branch, commit, etc.
+        depends on BR2_PACKAGE_SPARCS_PLP_RUST
+

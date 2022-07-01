@@ -1,0 +1,18 @@
+config BR2_PACKAGE_SPARCS_PLP_RUST
+    bool "sparcs-plp-rust"
+    depends on BR2_PACKAGE_HOST_RUSTC_TARGET_ARCH_SUPPORTS
+    select BR2_PACKAGE_HOST_RUSTC
+    help
+        Build and include the sparcs-plp-rust binaries on the target
+
+config BR2_PACKAGE_SPARCS_PLP_RUST_REPO_URL
+        string "URL of git repository"
+        depends on BR2_PACKAGE_SPARCS_PLP_RUST
+
+config BR2_PACKAGE_SPARCS_PLP_RUST_REPO_VERSION
+        string "Git repository version"
+        help
+          Revision to use in the typical format used by
+          git, e.g. a tag, commit, etc.
+        depends on BR2_PACKAGE_SPARCS_PLP_RUST
+
