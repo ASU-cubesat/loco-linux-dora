@@ -1,3 +1,4 @@
 menu "ASU Linux"
     source "$BR2_EXTERNAL_ASU_LINUX_PATH/package/sparcs_plp_rust/Config.in"
+    source "$BR2_EXTERNAL_ASU_LINUX_PATH/package/sparcs_plp_rust_cargo/Config.in"
 endmenu
