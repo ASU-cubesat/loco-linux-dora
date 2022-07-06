@@ -93,53 +93,65 @@ then
     exit 1
 fi
 
+#######################################
+### Do some local git configuration ###
+#######################################
+
+cd $SCRIPTPATH
+
+echo "Configuring git to overlook changes in ${localversion_file}..."
+git update-index --assume-unchanged $localversion_file
+
+#cd ..
+#git init 
+#git config --local url."https://".insteadOf git://
+
+
 #############################################################
 ### Download and install the buildroot package (optional) ###
 #############################################################
 if ! ${download}
 then
-    cd ..
+    cd $SRIPTPATH/..
 
-Downloading buildroot..."
+    echo "Downloading buildroot..."
     wget $buildroot_downloads/$buildroot.tar.gz 
 
-Unpacking buildroot..."
+    echo "Unpacking buildroot..."
     tar xzf $buildroot.tar.gz
 
-Removing temporary files..."
+    echo "Removing temporary files..."
     rm $buildroot.tar.gz
 
-Download complete"
+    echo "Download complete"
+
 fi
 
 #####################################
 ### Make the local version string ###
 #####################################
 
-
 #  Add the version number specified on the command line
 if [ ! -z "$version" ]
 then
+    echo "Adding custom string \"${version}\" linux kernal version..."
     localversion_string="${localversion_string}-${version}"
 fi
 
 # Add the latest git commit for this repository (not the linux kernel source tree)
 if [ ! -z "$commit" ]
 then
+    echo "Adding git commit hash ${commit} to linux kernal version..."
     localversion_string="${localversion_string}-${commit}"
 fi
 
-## This file created automatically by setup.sh" > $version_file
+# Overwite the localversion_file with the new string
 if [ ! -z "$localversion_string" ]
 then
     echo "Creating ./linux-localversion.config with CONFIG_LOCALVERSION=\"${localversion_string}\""
     echo "# This file auto created by ./setup.sh on " `date -u` > $localversion_file
     echo "CONFIG_LOCALVERSION=\"${localversion_string}\"" >> $localversion_file
 fi
-
-#cd ..
-#git init 
-#git config --local url."https://".insteadOf git://
 
 ###############################################################
 ### Tell buildroot about this external tree and config file ###
