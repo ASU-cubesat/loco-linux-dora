@@ -14,14 +14,14 @@ SET STATEFILE /tmp/monit.state
 # Set up our log file
 SET LOGFILE /var/log/monit.log
 CHECK FILE monit PATH /var/log/monit.log
-    IF SIZE > 1 MB THEN EXEC "/home/system/kubos/log-rotate.sh monit.log"
+    IF SIZE > 1 MB THEN EXEC "/usr/sbin/log-rotate.sh monit.log"
 
 # Enable the HTTP connection so that we can use Monit's CLI to collect status information
 SET HTTPD PORT 7000
     ALLOW kubos:Kubos123
     
-# Include all other Kubos Monit configuration files
+# Include all other Monit configuration files
 INCLUDE /etc/monit.d/*.cfg
 
 # Include all other user Monit configuration files
-INCLUDE /home/system/etc/monit.d/*.cfg
+#INCLUDE /home/system/etc/monit.d/*.cfg
