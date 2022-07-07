@@ -7,7 +7,7 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 
 cd $SCRIPTPATH
 
-buildroot="buildroot-2022.02.1"
+buildroot="buildroot-2022.02.3"
 buildroot_downloads="https://buildroot.uclibc.org/downloads"
 buildroot_dir="$SCRIPTPATH/../$buildroot"
 buildroot_make_args=
@@ -112,7 +112,7 @@ git update-index --assume-unchanged $localversion_file
 #############################################################
 if ! ${download}
 then
-    cd $SRIPTPATH/..
+    cd $SCRIPTPATH/..
 
     echo "Downloading buildroot..."
     wget $buildroot_downloads/$buildroot.tar.gz 

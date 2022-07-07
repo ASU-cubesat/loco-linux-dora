@@ -64,8 +64,8 @@ tar -czf ${BINARIES_DIR}/${GENIMAGE_2}.tar.gz -C ${BINARIES_DIR} ${GENIMAGE_2}.i
 ###############
 echo "post_image.sh: Cleaning up..."
 
-# Remove the SYSTEM_ITB blob from the target filesystem /upgrade folder 
-rm ${TARGET_DIR}/upgrade/*
+# Move the SYSTEM_ITB blob from the binaries folder in case it is needed for an upgrade
+mv ${TARGET_DIR}/upgrade/${SYSTEM_ITB} ${BINARIES_DIR}/
 
 # What was this for???
 rmdir ${TARGET_DIR}/microsd
