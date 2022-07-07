@@ -49,7 +49,7 @@
 			};
 		};
 		device_tree.dtb@1 {
-			data = /incbin/("./device_tree.dtb");
+			data = /incbin/("./pumpkin-mbm2.dtb");
 			type = "firmware";
 			arch = "arm";
 			os = "linux";
