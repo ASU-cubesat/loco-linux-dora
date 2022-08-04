@@ -15,7 +15,7 @@ Change directories to go inside loco-linux and run the setup script.  The setup 
     $ cd loco-linux
     $ ./setup.sh -d -c pumpkin-mbm2
     
-This will automatically download Buildroot and install it in the parent directory above loco-linux and add the loco-linux git hash to the compiled linux distribution (accessible through uname when runnning on the target).   The only board currently supported is the pumpkin-mbm2.   The script regitsters the loco-linux directory with Buildroot using Buildroot's BR2_EXTERNAL make argument.
+This will automatically download Buildroot and install it in the parent directory above loco-linux and add the loco-linux git hash to the compiled linux distribution (accessible at /proc/version on the target).   The only board currently supported is the pumpkin-mbm2.   The script regitsters the loco-linux directory with Buildroot using Buildroot's BR2_EXTERNAL make argument.
 
 To start the build, change directories into Buildroot and call make:
 
@@ -44,7 +44,7 @@ Several files will be in this directory, but the three main output files are:
 2. Insert the card into the BeagleBone Black and power on the device.  Hold down any key during boot to enter into the U-boot command line terminal.
 3. Enter the following:
 
-    $ setenv bootargs console=ttyS0,115200 root=/dev/mmcblk0p2 ext4 rootwait; fatload mmc 0:1 ${fdtaddr} /pumpkin-mbm2.dtb; fatload mmc 0:1 ${loadaddr} /kernel; bootm ${loadaddr} - ${fdtaddr} 
+    $ setenv bootargs console=ttyS0,115200 root=/dev/mmcblk0p2 ext4 rootwait; fatload mmc 0:1 \${fdtaddr} /pumpkin-mbm2.dtb; fatload mmc 0:1 \${loadaddr} /kernel; bootm \${loadaddr} - \${fdtaddr} 
     
 4. Enter "reset" to reboot 
 5. loco-linux should boot up, running from the micro-SD card (mmc0).  
