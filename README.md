@@ -44,14 +44,14 @@ Several files will be in this directory, but the three main output files are:
 2. Insert the card into the BeagleBone Black and power on the device.  Hold down any key during boot to enter into the U-boot command line terminal.
 3. Enter the following:
 
-    $ setenv bootargs console=ttyS0,115200 root=/dev/mmcblk0p2 ext4 rootwait; fatload mmc 0:1 <span>$</span>{fdtaddr} /pumpkin-mbm2.dtb; fatload mmc 0:1 ${loadaddr} /kernel; bootm <span>$</span>{loadaddr} - <span>$</span>{fdtaddr}  
+        $ setenv bootargs console=ttyS0,115200 root=/dev/mmcblk0p2 ext4 rootwait; fatload mmc 0:1 <span>$</span>{fdtaddr} /pumpkin-mbm2.dtb; fatload mmc 0:1 ${loadaddr} /kernel; bootm <span>$</span>{loadaddr} - <span>$</span>{fdtaddr}
     
 4. Enter "reset" to reboot 
 5. loco-linux should boot up, running from the micro-SD card (mmc0).  
 6. You should see the linux user prompt.  Enter "root".  There is no password.
 7. After loggin in, the final step is to install loco-linux on the internal flash (mmc1): 
 
-    $ install-os -i /mmcblk0 -o 1 -d -r 
+        $ install-os -i /mmcblk0 -o 1 -d -r 
 
 ### Method 2: Compressed disk image
 
@@ -69,13 +69,6 @@ To upgrade only the boot (partition 1) and root filesystem (partition 2) on an a
 1. Rename the file with a specific version number, e.g. system-1.0.1.itb
 2. Copy the .itb file to the device and place it in /upgrade.  Note that the upgrade parition is fairly small and you made need to delete an existing lder system.itb file to make room for the new one.  
 3. Set the U-Boot environment to tell it to install the new version on the next reboot:
-    $ fw_setenv kubos_updatefile system-1.0.1.itb
+        $ fw_setenv kubos_updatefile system-1.0.1.itb
 4. Reboot
   
-    
-    
-
-    
-    
-    
-    
