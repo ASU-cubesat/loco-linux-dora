@@ -18,7 +18,9 @@ The disk and linux image it creates is configured as follows:
     * Kernel 4.19
     * User accounts:  Only user account is "root", which has no password
     * BusyBox provides most of the standard command line functions, but some additional executables are included (e.g. parted)
-    * USB ethernet gadget is enabled so that it appears as a USB ethernet adapter when connected to host computer by USB.  Ethernet address of USB adapter is 192.168.7.2
+    * The BeagleBone will appear as a USB ethernet adapter when connected to host computer by USB.  TheUSB ethernet interface is configured with a static IP address: 192.168.7.2
+    * The standard (RJ45) ethernet interface is configured with static IP address: 10.0.2.20
+    * The debug console is on the BeagleBone's UART0 serial port.
     * Root filesystem contains key configurations:
         * /etc/default/dropbear: Configuration file to allow root login over SSH without password
         * /etc/dropbear/dropbear_ecdsa_host_key: Default SSH host key so it doesn't change each time loco-linux is installed
@@ -30,13 +32,13 @@ The disk and linux image it creates is configured as follows:
     * Home partition:
         * A symbolic link at /var/log points to /home/system/log.  Monit stores its logs here.
 
-The intent of loco-linux is to be able provide a redundant system with essentially identical primary and secondary disk, either of which is capable of fully running the operating system.  The BeagleBone boot select pin (GPIO 2_8, exposed as J133_4 on the MBM2) can be used to switch the order that the processor tries mmc1 and mmc0 on startup.  To provide redundance, the disk image should be installed on both the internal flash (mmc1) and the micro-SD (mmc0).  Only minor changes are needed to customize the image on each device:
+The intent of loco-linux is to be able provide a redundant system with essentially identical primary and secondary disks, either of which is capable of fully running the operating system.  The BeagleBone boot select pin (GPIO 2_8, exposed as J133_4 on the MBM2) can be used to switch the order that the processor tries mmc1 and mmc0 on startup.  To provide redundance, the disk image should be installed on both the internal flash (mmc1) and the micro-SD (mmc0).  Only minor changes are needed to customize the image on each device:
 
 1. Set a unique partuuid in the MBR on each device
-2. Copy the appropriate /etc/fstab.mmc* file to /etc/fstab so that the correct /upgrade (p3) and /home (p4) are mounted.
-3. Expand the /home partition to fill the full disk size, which may be different for the two devices depending on the size of the micro-SD card used.
+2. Expand the /home partition to fill the full size of each device.  Devices mmc0 and mmc1 may have different sizes depending on the size of the micro-SD card used for mmc0.
+3. Copy the appropriate /etc/fstab.mmc* file to /etc/fstab so that /upgrade (p3) and /home (p4) partitions are mounted from the same device as the root filesystem.
 
-Each of these changes can be made by setting the optional arguments to the install-os script when it is executed to copy the disk image to the selected device.  NOTE:  Currently, U-Boot doesn't support completely independent operation.  It always tries to read its environment from mmc1, regardless of which device was used by the processor for startup.  We intend to complete modifications to U-Boot to correct this behavior.
+Each of these changes can be made by setting the optional arguments to the install-os script when it is executed to copy the disk image to the selected device.  NOTE:  Currently, U-Boot doesn't support completely independent operation.  It always tries to read its environment from mmc1, regardless of which device was used by the processor for startup.  We intend to cmodify U-Boot to correct this behavior.
 
 ## Installation 
 
