@@ -4,7 +4,33 @@
 
 This repository is adapted from the Kubos linux configuration (https://github.com/kubos/kubos-linux-build).  It contains an external configuration for Buildroot (https://buildroot.org/) that creates a disk image containing linux and the U-Boot loader for the Pumpkin MBM2 based on the BeagleBone Black single board computer.  
 
-## Installation
+The disk and linux image it creates is configured as follows:
+* Disk Contents:
+    * Master boot record:  Contains partuuid and partition table
+    * Parittion 1 (~16 MB): Boot (U-Boot binary, linux kernel binary, flattened device tree)
+    * Partition 2 (~64 MB): Linux root filesystem (mounted as "/")
+    * Partition 3 (~256 MB): U-Boot upgrade (*.itb) and environment storage (mounted as "/upgrade")
+    * Partition 4 (~3000 MB): Rest of disk as ext4 (mounted as "/home")
+* U-Boot
+    * Configuration is identical to Kubos version (github.com/kubos/uboot) initially and will be modified for desired behavior soon.
+* Linux 
+    * Kernel 4.19
+    * User accounts:  Only user account is "root", which has no password
+    * BusyBox provides most of the standard command line functions, but some additional executables are included (e.g. parted)
+    * USB ethernet gadget is enabled so that it appears as a USB Ethernet adapater when connected to host computer by USB.  Ethernet address of USB adapter is 192.168.7.2
+    * Root filesystem contains key configurations:
+        * /etc/default/dropbear: Configuration file to allow root login over SSH without password
+        * /etc/dropbear/dropbear_ecdsa_host_key: Default SSH host key so it doesn't change each time loco-linux is installed
+        * /etc/fstab.mmc*: Template mount tables for installation on mmc0 or mmc1.  One of these is copied to /etc/fstab during installation. 
+        * /etc/inittab: Configuration of init, which runs during startup and performs disk checks and other operations before monit is started
+        * /etc/init.d:  Startup and shutdown scripts, e.g, Kubos script needed for tracking U-boot upgrade status, script that disables the user LEDs on startup, etc.
+        * /etc/monitrc: Configuration of monit to manage services
+        * /usr/sbin/install-os: Shell script used during installation of loco-linux on target device
+    * Home partition:
+        * A symbolic link at /var/log points to /home/system/log.  Monit stores its logs here.
+
+
+## Installation 
 
 Download this repository by cloning it with git:
 
@@ -69,6 +95,10 @@ To upgrade only the boot (partition 1) and root filesystem (partition 2) on an a
 1. Rename the file with a specific version number, e.g. system-1.0.1.itb
 2. Copy the .itb file to the device and place it in /upgrade.  Note that the upgrade parition is fairly small and you made need to delete an existing lder system.itb file to make room for the new one.  
 3. Set the U-Boot environment to tell it to install the new version on the next reboot:
+
         $ fw_setenv kubos_updatefile system-1.0.1.itb
+
 4. Reboot
   
+##   
+
