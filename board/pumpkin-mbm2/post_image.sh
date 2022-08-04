@@ -43,7 +43,6 @@ ${BASE_DIR}/build/uboot-${UBOOT_BRANCH}/tools/mkimage -E -f ${BINARIES_DIR}/${SY
 ###########################
 echo "post_image.sh: Creating full disk images..."
 
-mkdir ${TARGET_DIR}/microsd
 cd ${CURR_DIR}
 genimage \
     --rootpath "${TARGET_DIR}" \
