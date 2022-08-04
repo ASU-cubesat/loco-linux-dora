@@ -6,18 +6,19 @@ This repository is adapted from the Kubos linux configuration (https://github.co
 
 The disk and linux image it creates is configured as follows:
 * Disk Contents:
-    * Master boot record:  Contains partuuid and partition table
+    * Master boot record (MBR):  Contains partuuid and partition table
     * Parittion 1 (~16 MB): Boot (U-Boot binary, linux kernel binary, flattened device tree)
     * Partition 2 (~64 MB): Linux root filesystem (mounted as "/")
     * Partition 3 (~256 MB): U-Boot upgrade (*.itb) and environment storage (mounted as "/upgrade")
     * Partition 4 (~3000 MB): Rest of disk as ext4 (mounted as "/home")
+    * NOTE: We've limited the number of partitions to four so that they are all primary partitions.  More than four requires the use of logical partitions.  It isn't a big deal, but this makes resizing the "/home" partition to fit the disk easier during installation.
 * U-Boot
     * Configuration is identical to Kubos version (github.com/kubos/uboot) initially and will be modified for desired behavior soon.
 * Linux 
     * Kernel 4.19
     * User accounts:  Only user account is "root", which has no password
     * BusyBox provides most of the standard command line functions, but some additional executables are included (e.g. parted)
-    * USB ethernet gadget is enabled so that it appears as a USB Ethernet adapater when connected to host computer by USB.  Ethernet address of USB adapter is 192.168.7.2
+    * USB ethernet gadget is enabled so that it appears as a USB ethernet adapter when connected to host computer by USB.  Ethernet address of USB adapter is 192.168.7.2
     * Root filesystem contains key configurations:
         * /etc/default/dropbear: Configuration file to allow root login over SSH without password
         * /etc/dropbear/dropbear_ecdsa_host_key: Default SSH host key so it doesn't change each time loco-linux is installed
@@ -29,6 +30,10 @@ The disk and linux image it creates is configured as follows:
     * Home partition:
         * A symbolic link at /var/log points to /home/system/log.  Monit stores its logs here.
 
+The intent of loco-linux is to be able provide a redundant system. with essentially identical primary and secondary disk, either of which is capable of fully running the operating system.  The BeaglBone boot select pin (GPIO 2_8, exposed as pin 4 on J133 on the MBM2) can be used to switch the processor between first querying mmc1 or mmc0.  To provide redundance, the disk image should be installed on both the internal flash (mmc1) and the micro-SD (mmc0).  Only minor changes are needed to customize the image on each device:
+    1. Set a unique partuuid in the MBR on each device
+    2. Copy the appropriate /etc/fstab.mmc* file to /etc/fstab so that the correct /upgrade (p3) and /home (p4) are mounted.
+Each of these changes can be made by setting the optional arguments to the install-os script when it is executed to copy the disk image to the selected device.  NOTE:  Currently, U-Boot doesn't support completely independent operation.  It always tries to read its environment from mmc1, regardless of which device was used by the processor for startup.  We intend to complete modifications to U-Boot to correct this behavior.
 
 ## Installation 
 
