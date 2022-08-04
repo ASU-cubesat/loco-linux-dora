@@ -44,7 +44,7 @@ Several files will be in this directory, but the three main output files are:
 2. Insert the card into the BeagleBone Black and power on the device.  Hold down any key during boot to enter into the U-boot command line terminal.
 3. Enter the following:
 
-    <span>$</span> setenv bootargs console=ttyS0,115200 root=/dev/mmcblk0p2 ext4 rootwait; fatload mmc 0:1 <span>$</span>{fdtaddr} /pumpkin-mbm2.dtb; fatload mmc 0:1 ${loadaddr} /kernel; bootm <span>$</span>{loadaddr} - <span>$</span>{fdtaddr}  
+    $ setenv bootargs console=ttyS0,115200 root=/dev/mmcblk0p2 ext4 rootwait; fatload mmc 0:1 <span>$</span>{fdtaddr} /pumpkin-mbm2.dtb; fatload mmc 0:1 ${loadaddr} /kernel; bootm <span>$</span>{loadaddr} - <span>$</span>{fdtaddr}  
     
 4. Enter "reset" to reboot 
 5. loco-linux should boot up, running from the micro-SD card (mmc0).  
