@@ -58,7 +58,7 @@ Several files will be in this directory, but the three main output files are:
 If you already have linux (loco-linux or another reasonably functional linux) running on the BeagleBone, you can use the compressed image file to avoid having to use a micro-SD card.  
 
 1. Copy os.img.gz to the running linux on the target, make sure it is not on the disk (mmc0 or mmc1) that you want to overwrite.
-2. Run the following, replacing <target mmc> with either 0 or 1 for micro-SD card or internal flash, respectively.
+2. Run the following, replacing \<target mmc\> with either 0 or 1 for micro-SD card or internal flash, respectively.
     
         $ install-os -i ./os.img.gz -o <target mmc> -d -r 
         
