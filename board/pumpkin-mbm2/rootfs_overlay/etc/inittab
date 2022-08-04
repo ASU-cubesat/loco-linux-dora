@@ -13,35 +13,40 @@
 # runlevels == ignored
 # action    == one of sysinit, respawn, askfirst, wait, and once
 # process   == program to run
+#
+# NOTE: This file has been modified from its original form
 
 # Startup the system
 ::sysinit:/bin/mount -t proc proc /proc
 ::sysinit:/bin/mkdir -p /dev/pts
 ::sysinit:/bin/mkdir -p /dev/shm
-# Check & clean partitions
-::sysinit:/sbin/fsck -p /dev/mmcblk0p1
-::sysinit:/sbin/fsck -p /dev/mmcblk0p2
+
+# Check & clean partitions on mmc1 (internal flash)
+# 2=rootfs, 3=envar, 4=upgrade, 5=home
 ::sysinit:/sbin/fsck -p /dev/mmcblk1p2
 ::sysinit:/sbin/fsck -p /dev/mmcblk1p3
 ::sysinit:/sbin/fsck -p /dev/mmcblk1p4
-# Check & clean partitions in no-SD-card case
+
+# Check & clean partitions on mmc0 (micro-SD card)
+# 2=rootfs, 3=envar, 4=upgrade, 5=home
+::sysinit:/sbin/fsck -p /dev/mmcblk0p2
 ::sysinit:/sbin/fsck -p /dev/mmcblk0p3
 ::sysinit:/sbin/fsck -p /dev/mmcblk0p4
+
 # Mount up partitions with data
 ::sysinit:/bin/mount -o remount,rw /
 ::sysinit:/bin/mount -a
 ::sysinit:/bin/mkdir -p /run/lock
-# Mount the Kubos directories which use partuuid
-::sysinit:/bin/mount /home
-::sysinit:/bin/mount /home/microsd
-::sysinit:/bin/mount /upgrade
-::sysinit:/bin/mount /envar
+
 # Setup hostname
 ::sysinit:/bin/hostname -F /etc/hostname
+
 # now run any rc scripts
 ::sysinit:/etc/init.d/rcS
+
 # incremente the boot counter
 ::sysinit:/usr/sbin/boot_counter
+
 # Run Monit in standard run-levels
 ::respawn:/usr/bin/monit -Ic /etc/monitrc
 

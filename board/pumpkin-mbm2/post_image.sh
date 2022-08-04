@@ -5,8 +5,9 @@ CURR_DIR="$(pwd)"
 UBOOT_BRANCH=$2
 GENIMAGE_CFG="${BOARD_DIR}/genimage.cfg"
 GENIMAGE_TMP="${BUILD_DIR}/genimage.tmp"
-GENIMAGE_1="internal_mmc" # use image name from inside genimage.cfg
-GENIMAGE_2="microsd"      # use image name from inside genimage.cfg
+GENIMAGE_1="os" # use image name from inside genimage.cfg
+#GENIMAGE_1="mmc1_internal" # use image name from inside genimage.cfg
+#GENIMAGE_2="mmc0_microsd"  # use image name from inside genimage.cfg
 KERNEL_ITS="kernel.its"
 KERNEL_ITB="kernel"
 SYSTEM_ITS="system.its"
@@ -54,10 +55,10 @@ genimage \
 ###################################
 ### GZIP images to reduce space ###
 ###################################
-echo "post_image.sh: Creating compressed (tar.gz) versions of disk images..."
+echo "post_image.sh: Creating compressed (.gz) versions of disk images..."
 
-tar -czf ${BINARIES_DIR}/${GENIMAGE_1}.tar.gz -C ${BINARIES_DIR} ${GENIMAGE_1}.img
-tar -czf ${BINARIES_DIR}/${GENIMAGE_2}.tar.gz -C ${BINARIES_DIR} ${GENIMAGE_2}.img
+gzip -c ${BINARIES_DIR}/${GENIMAGE_1}.img > ${BINARIES_DIR}/${GENIMAGE_1}.img.gz
+#tar -czf ${BINARIES_DIR}/${GENIMAGE_2}.tar.gz -C ${BINARIES_DIR} ${GENIMAGE_2}.img
 
 ###############
 ### Cleanup ###
@@ -67,19 +68,15 @@ echo "post_image.sh: Cleaning up..."
 # Move the SYSTEM_ITB blob from the binaries folder in case it is needed for an upgrade
 mv ${TARGET_DIR}/upgrade/${SYSTEM_ITB} ${BINARIES_DIR}/
 
-# What was this for???
-rmdir ${TARGET_DIR}/microsd
-
 # Remove the partition images to free up disk space since these are included in 
 # the full disk images
-rm ${BINARIES_DIR}/user
-rm ${BINARIES_DIR}/aux-user
 rm ${BINARIES_DIR}/upgrade
+rm ${BINARIES_DIR}/home
 
 # Remove the uncompressed full disk images to free up disk space since we have
 # the gzip compressed versions
-rm ${BINARIES_DIR}/${GENIMAGE_1}.img
-rm ${BINARIES_DIR}/${GENIMAGE_2}.img
+#rm ${BINARIES_DIR}/${GENIMAGE_1}.img
+#rm ${BINARIES_DIR}/${GENIMAGE_2}.img
 
 # Remove genimage temporary files
 rm -rf "${GENIMAGE_TMP}"

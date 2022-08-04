@@ -17,8 +17,9 @@ CHECK FILE monit PATH /var/log/monit.log
     IF SIZE > 1 MB THEN EXEC "/usr/sbin/log-rotate.sh monit.log"
 
 # Enable the HTTP connection so that we can use Monit's CLI to collect status information
+# username=user, password=passwd
 SET HTTPD PORT 7000
-    ALLOW kubos:Kubos123
+    ALLOW user:passwd
     
 # Include all other Monit configuration files
 INCLUDE /etc/monit.d/*.cfg

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Turn off the user leds on the BBB
+/usr/sbin/leds.sh off
+

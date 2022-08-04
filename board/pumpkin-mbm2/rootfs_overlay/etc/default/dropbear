@@ -1,0 +1,2 @@
+# Add dropbear args to allow SSH without password
+export DROPBEAR_ARGS="-B"

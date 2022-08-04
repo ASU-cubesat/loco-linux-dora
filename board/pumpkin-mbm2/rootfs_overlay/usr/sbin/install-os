@@ -15,37 +15,297 @@
 # limitations under the License.
 #
 # Copy a KubOS image from the SD card to the eMMC
+#
+# LOCO-LINUX NOTE: 
+# 
+# This file has been modified from its original version to setup nearly
+# identical disk images on both the mmc0 and mmc1.  After copying the
+# disk image from the micro-SD card in mmc0, it makes a few disk-specific
+# changes (see end of script).
 
-# Make sure the user's sure they want to wipe out their eMMC
-echo "** Warning ** This script will wipe out the current contents of the eMMC"
-echo "Are you sure you want to proceed? (y/N)"
-read ANSWER
 
-# Check if there *isn't* a 'y' in the answer
-if [ "$ANSWER" == "${ANSWER#[Yy]}" ] ;then
-    echo "Cancelling installation. Script exiting"
-    exit
+
+# Define the default configuration
+src=
+trg=
+root_prt=2
+last_prt=4
+stop_services=false
+update_signature=false
+resize_partition=false
+
+# Define the disk signature for each mmc
+signature_0="\x50\x50\x50\x50" 
+signature_1="\x51\x51\x51\x51"
+
+
+######################################
+### Define the help message        ###
+######################################
+help_message="
+  Copies the disk image from the input source to the output target 
+  mmc.  Optionally performs follow-up filesystem manipulation.
+
+  Syntax: ./install-os [-d|h|i|o|r|s]
+  
+  options:
+   
+   -i         (required) Input device or image file.  It can be
+              the path to a device, e.g. /dev/mmcblk0, or the
+              path to a compressed or uncompressed disk image, 
+              e.g. os.img.gz or os.img.
+  
+   -o         (required) Output mmc device number:
+                0 = microSD (/dev/mmcblk0)
+                1 = internal eMMC (/dev/mmcblk1)
+                
+   -d         Replace the disk signature in the MBR after copying 
+              the disk image to the target device. The signature 
+              used depends on the target device:
+                target=0:  ${signature_0}
+                target=1:  ${signature_1}
+
+   -h         Print this help
+   
+   -r         After installing the disk image on target, this will
+              resize partion ${last_prt} and its filesystem to fill the 
+              available space on the target disk.  Partition ${last_prt}
+              is assumed to be the last partition on the disk.   
+              This has only been tested on primary partitions, not 
+              logical partions.  It assumes parted and resize2fs
+              are included in the disk image that was installed
+              on the target.
+   
+   -s         Stop all services before copying image to target mmc                
+
+"
+
+######################################
+### Parse the command line options ###
+######################################
+while getopts "i:o:dhrs" option
+do
+    case $option in
+
+        i)
+            src=$OPTARG
+            if readlink ${src}; then
+                src=$(readlink ${src})
+            fi
+            ;;
+        o)
+            trg=$OPTARG
+            ;;        
+        d)
+            update_signature=true
+            ;;
+        h)
+            echo "$help_message"
+            exit 0
+            ;;    
+        r) resize_partition=true
+            ;;     
+        s)
+            stop_services=true
+            ;;
+        :)
+            echo "install-os: Error! Missing argument for -${OPTARG}." >&2
+            echo "$help_message" >&2
+            exit 1
+            ;;
+        \?)
+            echo "install-os: Error! Unrecognized argument ${OPTARG}." >&2
+            echo "$help_message" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# Abort if no input source path is provided
+if [ -z "$src" ]; then
+    echo "install-os: Error! Argument -i must be provided." >&2
+    echo "$help_message" >&2
+    exit 1
 fi
 
-# Stop monit
-echo "OS Install: Pausing monitoring"
-monit unmonitor all
+# Abort if output target isn't 0 or 1
+if [ "${trg}" != "0" ] && [ "${trg}" !=  "1" ]; then
+    echo "install-os: Error! Argument -o must be provided as 0 or 1." >&2
+    echo "$help_message" >&2
+    exit 1
+fi
 
-# Stop all the services
-echo "OS Install: Stopping running services"
-for i in $(ls /var/run/*.pid); do
-    kill -15 $(cat $i)
+# Abort if input source and output target are same
+if [ "${src}" = "/dev/mmcblk${trg}" ]; then
+    echo "install-os: Error! Input source is same as target." >&2
+    echo "$help_message" >&2
+    exit 1
+fi
+    
+# Make sure the user is sure they want to wipe out their mmc
+echo ""
+echo "*** WARNING:"
+echo "*** This script will delete the current contents of mmc${trg}."
+echo "*** Press CTRL-c within five seconds to abort the script."
+sleep 5
+echo "*** Continuing..."
+echo ""
+echo "install-os: Proceeding with input image: ${src}"
+echo "install-os: Proceeding with target device: mmc${trg} (/dev/mmcblk${trg})"
+echo ""
+sleep 1
+
+# OPTION - If the stop services command line option was set, do it
+if [ ${stop_services} = true ]; then
+
+    # Stop monit
+    echo "install-os: Pausing monit"
+    monit unmonitor all
+
+    # Stop all the services
+    echo "install-os: Stopping running services"
+    for i in $(ls /var/run/*.pid); do
+        echo "Stopping $(cat $i)"
+        kill -15 $(cat $i)
+    done
+
+    # Give the system a moment to settle
+    sleep 2
+fi
+
+# Unmount anything from target mmc, abort if the mounted root 
+# filesystem is on the target mmc (not sure what would happen
+# if we tried to install a disk image over the active root fs).
+echo "install-os: Unmounting target mmc${trg}"
+for i in $(mount -l | grep /dev/mmcblk${trg} | cut -d" " -f3); do
+    if [ "$i" = "/" ]; then
+        echo "install-os: Error! Target mmc${trg} is mounted on /"
+        exit 1
+    else
+        umount -v $i
+    fi
 done
-killall -15 python
+    
+# Copy the input source image to target mmc
+echo "install-os: Copying input image to target mmc${trg}"
+echo "install-os: This process may take 10+ minutes to complete"
 
-# Give the system a moment to settle
-sleep 2
+# Get the target size
+block_size=512 # mmc block size on BeagleBone Black
+blocks_trg=$(cat /sys/class/block/mmcblk${trg}/size)
+bytes_trg=`expr ${blocks_trg} \* ${block_size}`
+echo "install-os: Target size is: ${bytes_trg} bytes"
 
-# Unmount /home
-echo "OS Install: Prepping the file system"
-umount -l /home
+# Handle each source scenario
 
-# Copy the SD card over to the eMMC
-echo "OS Install: Copying SD card contents over to eMMC. This process should take 10-15 minutes to complete"
-BLOCKS=$(cat /sys/class/block/mmcblk1/size)
-dd if=/dev/mmcblk0 count=${BLOCKS} status=noxfer | pv -s `expr ${BLOCKS} / 2`k | dd of=/dev/mmcblk1
+# The input source is a device
+if [[ "${src}" = "/dev/mmcblk"[01] ]]; then
+
+    # First figure out if the target or source is smaller size
+    # so we only copy the blocks that will fit on the target.
+
+    # Get the source size
+    blocks_src=$(cat /sys/class/block/${src##*/}/size)
+    echo "install-os: Source size is `expr ${blocks_src} \* ${block_size}` bytes"
+    
+    # Use the smaller of the target and source sizes
+    blocks=$(( blocks_src < blocks_trg ? blocks_src : blocks_trg ))
+    
+    # Now do the copy
+    dd if=${src} count=${blocks} status=noxfer | pv -s `expr ${blocks} \* ${block_size}` | dd of=/dev/mmcblk${trg}
+
+# The input source is a file
+else
+    
+    case ${src##*.} in
+    
+        gz|gzip) # Compressed image file
+        
+            # Too slow to get the uncompressed file size, so don't worry about it
+            echo "install-os: Uncompressed source size is: unknown"     
+            
+            # Now do the copy       
+            gzip -d -c ${src} | pv | dd count=${blocks_trg} iflag=fullblock of=/dev/mmcblk${trg}        
+            ;;
+
+        *) # Uncompressed image file
+        
+            # Get the input size -- this gives the size used by the file on disk, 
+            # which may be larger than the actual file size, but it is close enough
+            # for a reasonable status bar.  Tried wc -c, but was very slow, e.g.
+            # 45 seconds / gigabyte on the BeagleBone Black.
+            bytes_src=$(du -sb ${src} | cut -f1)
+            echo "install-os:  Source size is: ${bytes_src} bytes"       
+            
+            # We need to use "bc" to do the math because bytes could exceed the shell 
+            # math integer size, which is 2^31-1 (2 GB) on the BeagleBone Black.
+            bytes=$(echo "if (${bytes_src} < ${bytes_trg}) print ${bytes_src} else print ${bytes_trg}" | bc)
+            
+            # Now do the copy
+            pv -s ${bytes} < ${src} | dd count=${blocks_trg} iflag=fullblock of=/dev/mmcblk${trg}
+            ;;
+     esac
+fi
+
+# OPTION - Set disk signature on target
+# This is a commandline option, but really it should always be done 
+# if the input source is /dev/mmcblk[01], becuase otherwise the source 
+# and target devices will have identical partuuid, causing problems.
+if [ ${update_signature} = true ]; then
+    echo "install-os: Updating disk signature on target"
+    if [ ${trg} = 0 ]; then
+        signature=$signature_0
+    else
+        signature=$signature_1
+    fi
+    echo -en "${signature}" | dd of=/dev/mmcblk${trg} conv=notrunc seek=440 bs=1
+fi
+
+# Configure new filesystem
+
+# Start by mounting the root file system just installed on the target
+echo "install-os: Mounting new filesystem"
+mnt="/tmp/install-os-target"
+mkdir ${mnt}
+mount -t ext4 /dev/mmcblk${trg}p${root_prt} ${mnt}
+
+# There should be two fstab.mmc[01] files.  Set the correct one
+echo "install-os: Copying appropriate fstab for target"
+cp ${mnt}/etc/fstab.mmc${trg} ${mnt}/etc/fstab
+
+# OPTION - Resize the final partition to fill the disk
+# Assumes the final partition is a primary partition, not a logical
+# partition.  This generally means it can't be higher than 4. 
+if [ ${resize_partition} = true ]; then
+
+    LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${mnt}/usr/lib"
+    export LD_LIBRARY_PATH
+    
+    # Resize the partition
+    echo "install-os: Resizing /dev/mmcblk${trg}p${last_prt} partition to fill disk"        
+    parted_exe="${mnt}/usr/sbin/parted"
+    ${parted_exe} -s /dev/mmcblk${trg} unit % resizepart ${last_prt} 100 
+    
+    # Resize the filesystem in the partition (assumes ext2, ext3, or ext4)
+    # This writes to each byte, I think, so can be very slow for large disks
+    echo "install-os: Resizing filesystem to fill /dev/mmcblk${trg}p${last_prt}"
+    echo "install-os: This process may take 10+ minutes to complete"
+    mnt_prt=/tmp/install-os-target-p${last_prt}
+    resize2fs_exe="${mnt}/sbin/resize2fs"
+    ${resize2fs_exe} /dev/mmcblk${trg}p${last_prt}
+
+fi
+
+# Cleanup by unmounting our temporary mount point
+echo "install-os: Cleaning up"
+umount ${mnt}
+rmdir ${mnt}
+
+# Done
+echo "install-os: Done.  Recommend rebooting."
+
+
+
+
+
+
