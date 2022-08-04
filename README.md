@@ -30,9 +30,12 @@ The disk and linux image it creates is configured as follows:
     * Home partition:
         * A symbolic link at /var/log points to /home/system/log.  Monit stores its logs here.
 
-The intent of loco-linux is to be able provide a redundant system. with essentially identical primary and secondary disk, either of which is capable of fully running the operating system.  The BeaglBone boot select pin (GPIO 2_8, exposed as pin 4 on J133 on the MBM2) can be used to switch the processor between first querying mmc1 or mmc0.  To provide redundance, the disk image should be installed on both the internal flash (mmc1) and the micro-SD (mmc0).  Only minor changes are needed to customize the image on each device:
+The intent of loco-linux is to be able provide a redundant system with essentially identical primary and secondary disk, either of which is capable of fully running the operating system.  The BeagleBone boot select pin (GPIO 2_8, exposed as J133_4 on the MBM2) can be used to switch the order that the processor tries mmc1 and mmc0 on startup.  To provide redundance, the disk image should be installed on both the internal flash (mmc1) and the micro-SD (mmc0).  Only minor changes are needed to customize the image on each device:
+
     1. Set a unique partuuid in the MBR on each device
     2. Copy the appropriate /etc/fstab.mmc* file to /etc/fstab so that the correct /upgrade (p3) and /home (p4) are mounted.
+    3. Expand the /home partition to fill the full disk size, which may be different for the two devices depending on the size of the micro-SD card used.
+
 Each of these changes can be made by setting the optional arguments to the install-os script when it is executed to copy the disk image to the selected device.  NOTE:  Currently, U-Boot doesn't support completely independent operation.  It always tries to read its environment from mmc1, regardless of which device was used by the processor for startup.  We intend to complete modifications to U-Boot to correct this behavior.
 
 ## Installation 
