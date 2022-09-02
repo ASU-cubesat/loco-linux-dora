@@ -6,12 +6,10 @@ UBOOT_BRANCH=$2
 GENIMAGE_CFG="${BOARD_DIR}/genimage.cfg"
 GENIMAGE_TMP="${BUILD_DIR}/genimage.tmp"
 GENIMAGE_1="os" # use image name from inside genimage.cfg
-#GENIMAGE_1="mmc1_internal" # use image name from inside genimage.cfg
-#GENIMAGE_2="mmc0_microsd"  # use image name from inside genimage.cfg
 KERNEL_ITS="kernel.its"
 KERNEL_ITB="kernel"
-SYSTEM_ITS="system.its"
-SYSTEM_ITB="system.itb"
+SYSTEM_ITS="update-pack.its"
+SYSTEM_ITB="update-pack.itb"
 
 #########################################################
 ### Create the kernel flattened image tree (FIT) file ###

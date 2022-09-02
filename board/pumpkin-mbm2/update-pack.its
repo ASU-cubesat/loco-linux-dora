@@ -20,7 +20,7 @@
 /dts-v1/;
 
 / {
-	description = "Linux System Image Tree";
+	description = "Image tree for system update using U-boot (with KubOS extension)";
 	#address-cells = <1>;
 
 	images {
@@ -48,7 +48,7 @@
 				algo = "sha256";
 			};
 		};
-		device_tree.dtb@1 {
+		pumpkin-mbm2.dtb@1 {
 			data = /incbin/("./pumpkin-mbm2.dtb");
 			type = "firmware";
 			arch = "arm";

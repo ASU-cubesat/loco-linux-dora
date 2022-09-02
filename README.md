@@ -16,9 +16,9 @@ The disk and linux image it creates is configured as follows:
     * Configuration is identical to Kubos version (github.com/kubos/uboot) initially and will be modified for desired behavior soon.
 * Linux 
     * Kernel 4.19
-    * User accounts:  Only user account is "root", which has no password
+    * User accounts:  The only user account is "root", which has no password
     * BusyBox provides most of the standard command line functions, but some additional executables are included (e.g. parted)
-    * The BeagleBone will appear as a USB ethernet adapter when connected to host computer by USB.  TheUSB ethernet interface is configured with a static IP address: 192.168.7.2
+    * The BeagleBone will appear as a USB ethernet adapter when connected to host computer by USB.  The USB ethernet interface is configured with a static IP address: 192.168.7.2
     * The standard (RJ45) ethernet interface is configured with static IP address: 10.0.2.20
     * The debug console is on the BeagleBone's UART0 serial port.
     * Root filesystem contains key configurations:
@@ -38,7 +38,7 @@ The intent of loco-linux is to be able provide a redundant system with essential
 2. Expand the /home partition to fill the full size of each device.  Devices mmc0 and mmc1 may have different sizes depending on the size of the micro-SD card used for mmc0.
 3. Copy the appropriate /etc/fstab.mmc* file to /etc/fstab so that /upgrade (p3) and /home (p4) partitions are mounted from the same device as the root filesystem.
 
-Each of these changes can be made by setting the optional arguments to the install-os script when it is executed to copy the disk image to the selected device.  NOTE:  Currently, U-Boot doesn't support completely independent operation.  It always tries to read its environment from mmc1, regardless of which device was used by the processor for startup.  We intend to cmodify U-Boot to correct this behavior.
+Each of these changes can be made by setting the optional arguments to the install-os script when it is executed to copy the disk image to the selected device.  NOTE:  Currently, U-Boot doesn't support completely independent operation.  It always tries to read its environment from mmc1, regardless of which device was used by the processor for startup.  We intend to modify U-Boot to correct this behavior.
 
 ## Installation 
 
@@ -103,7 +103,7 @@ If you already have linux (loco-linux or another reasonably functional linux) ru
 To upgrade only the boot (partition 1) and root filesystem (partition 2) on an already running loco-linux installation, you can use the system.itb file:
 
 1. Rename the file with a specific version number, e.g. system-1.0.1.itb
-2. Copy the .itb file to the device and place it in /upgrade.  Note that the upgrade parition is fairly small and you made need to delete an existing lder system.itb file to make room for the new one.  
+2. Copy the .itb file to the device and place it in /upgrade.  Note that the upgrade parition is fairly small and you made need to delete an existing older system.itb file to make room for the new one.  
 3. Set the U-Boot environment to tell it to install the new version on the next reboot:
 
         $ fw_setenv kubos_updatefile system-1.0.1.itb

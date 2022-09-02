@@ -12,9 +12,12 @@ sysfs		/sys		sysfs	defaults	0	0
 /dev/mmcblk0p4  /home               ext4    defaults               0       2
 
 # Define but don't mount points for both mmc0 and mmc1 partitions
+/dev/mmcblk0p1	/mnt/mmc0/boot      vfat    defaults,noauto        0       0
 /dev/mmcblk0p2  /mnt/mmc0           ext4    defaults,noauto        0       0
 /dev/mmcblk0p3  /mnt/mmc0/upgrade   ext4    defaults,noauto        0       0
 /dev/mmcblk0p4  /mnt/mmc0/home      ext4    defaults,noauto        0       0
+
+/dev/mmcblk1p1	/mnt/mmc1/boot      vfat    defaults,noauto        0       0
 /dev/mmcblk1p2  /mnt/mmc1           ext4    defaults,noauto        0       0
 /dev/mmcblk1p3  /mnt/mmc1/upgrade   ext4    defaults,noauto        0       0
 /dev/mmcblk1p4  /mnt/mmc1/home      ext4    defaults,noauto        0       0

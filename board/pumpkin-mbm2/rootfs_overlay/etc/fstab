@@ -1,5 +1,5 @@
 # <file system>	<mount pt>	<type>	<options>	<dump>	<pass>
-/dev/root	/		ext2	rw,noauto	0	1
+/dev/root	/		    ext2	rw,noauto	0	1
 proc		/proc		proc	defaults	0	0
 devpts		/dev/pts	devpts	defaults,gid=5,mode=620	0	0
 tmpfs		/dev/shm	tmpfs	mode=0777	0	0
@@ -7,12 +7,11 @@ tmpfs		/tmp		tmpfs	mode=1777	0	0
 tmpfs		/run		tmpfs	mode=0755,nosuid,nodev	0	0
 sysfs		/sys		sysfs	defaults	0	0
 
-# Mount points for both mmc0 and mmc1 partitions
+# Define and mount points for both mmc0 and mmc1 partitions
 /dev/mmcblk0p2  /mnt/mmc0           ext4    defaults        0       0
-/dev/mmcblk0p3  /mnt/mmc0/envar     ext4    defaults        0       0
-/dev/mmcblk0p4  /mnt/mmc0/upgrade   ext4    defaults        0       0
-/dev/mmcblk0p5  /mnt/mmc0/home      ext4    defaults        0       0
+/dev/mmcblk0p3  /mnt/mmc0/upgrade   ext4    defaults        0       0
+/dev/mmcblk0p4  /mnt/mmc0/home      ext4    defaults        0       0
+
 /dev/mmcblk1p2  /mnt/mmc1           ext4    defaults        0       0
-/dev/mmcblk1p3  /mnt/mmc1/envar     ext4    defaults        0       0
-/dev/mmcblk1p4  /mnt/mmc1/upgrade   ext4    defaults        0       0
-/dev/mmcblk1p5  /mnt/mmc1/home      ext4    defaults        0       0
+/dev/mmcblk1p3  /mnt/mmc1/upgrade   ext4    defaults        0       0
+/dev/mmcblk1p4  /mnt/mmc1/home      ext4    defaults        0       0
