@@ -7,7 +7,7 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 
 cd $SCRIPTPATH
 
-buildroot="buildroot-2022.02.3"
+buildroot="buildroot-2022.08.1"
 buildroot_downloads="https://buildroot.uclibc.org/downloads"
 buildroot_dir="$SCRIPTPATH/../$buildroot"
 buildroot_make_args=
