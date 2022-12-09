@@ -77,6 +77,7 @@ Several files will be in this directory, but the three main output files are:
 ### Method 1: Bootable micro-SD card
 
 1. Install the os.img file onto a bootable micro-SD card.
+   * Note this image has the wrong disk partuuid for the SD card. This will be fixed later in the install.
 2. Insert the card into the BeagleBone Black and power on the device.  Hold down any key during boot to enter into the U-boot command line terminal.
 3. Enter the following:
 
@@ -87,7 +88,17 @@ Several files will be in this directory, but the three main output files are:
 6. You should see the linux user prompt.  Enter "root".  There is no password.
 7. After loggin in, the final step is to install loco-linux on the internal flash (mmc1): 
 
-        $ install-os -i /mmcblk0 -o 1 -d -r 
+        $ install-os -i /dev/mmcblk0 -o 1 -d -r 
+        
+8. Reboot to the internal flash (mmc1). Hold space while rebooting to drop into the U-Boot terminal then execute:
+
+        $ setenv bootargs console=ttyS0,115200 root=/dev/mmcblk1p2 ext4 rootwait; fatload mmc 1:1 ${fdtaddr} /pumpkin-mbm2.dtb; fatload mmc 1:1 ${loadaddr} /kernel; bootm ${loadaddr} - ${fdtaddr}
+    
+9. Run install os again but output to the SD-card
+
+        $ install-os -i /dev/mmcblk1 -o 0 -d -r 
+        
+    * This fixes the partuuid on the SD card note from step 1 and copies the correct fstab into /etc
 
 ### Method 2: Compressed disk image
 
