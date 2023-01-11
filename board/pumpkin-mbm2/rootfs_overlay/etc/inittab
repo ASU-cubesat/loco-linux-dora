@@ -35,6 +35,8 @@
 
 # Mount up partitions with data
 ::sysinit:/bin/mount -o remount,rw /
+# Copies the correct fstab for the given mmc
+::sysinit:/bin/sh /usr/sbin/copy_fstab
 ::sysinit:/bin/mount -a
 ::sysinit:/bin/mkdir -p /run/lock
 

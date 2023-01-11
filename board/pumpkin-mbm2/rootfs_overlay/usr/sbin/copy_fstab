@@ -1,0 +1,12 @@
+#!/usr/bin/sh 
+
+# check which mmcblk we booted to
+# then copy the appropriate fstab over
+if [ $(cat /proc/cmdline | grep /dev/mmcblk | cut -d" " -f2 | cut -c 17) == 0 ]; then
+    cp /etc/fstab.mmc0 /etc/fstab
+    echo copied fstab for mmc0
+else   
+    cp /etc/fstab.mmc1 /etc/fstab
+    echo copied fstab for mmc1
+fi
+
