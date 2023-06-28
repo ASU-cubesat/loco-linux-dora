@@ -12,8 +12,8 @@
 
 [ ! -x /sbin/hwclock ] && exit 0
 
-#. /etc/default/rcS
-. /etc/default/hwclock
+[ ! -r /etc/default/rcS ] || . /etc/default/rcS
+[ ! -r /etc/default/hwclock ] || . /etc/default/hwclock
 
 [ "$UTC" = yes ] && UTC=--utc || UTC=--localtime
 
