@@ -45,7 +45,7 @@ help_message="
    -d         Download and unzip buildroot to the parent directory
    -h         Print this help
    -v text    Add a custom version string to the linux kernel
-              local version info (must be shorter than 54 
+              local version info (must be shorter than 54
               characters).  Overwrites the file:
               ./linux-localversion.config.  If used with -c, both
               will be added to the version info.
@@ -103,19 +103,19 @@ echo "Configuring git to overlook changes in ${localversion_file}..."
 git update-index --assume-unchanged $localversion_file
 
 #cd ..
-#git init 
+#git init
 #git config --local url."https://".insteadOf git://
 
 
 #############################################################
 ### Download and install the buildroot package (optional) ###
 #############################################################
-if ! ${download}
+if [ ! -z "$download" ]
 then
     cd $SCRIPTPATH/..
 
     echo "Downloading buildroot..."
-    wget $buildroot_downloads/$buildroot.tar.gz 
+    wget $buildroot_downloads/$buildroot.tar.gz
 
     echo "Unpacking buildroot..."
     tar xzf $buildroot.tar.gz
@@ -157,9 +157,9 @@ fi
 ### Tell buildroot about this external tree and config file ###
 ###############################################################
 
-# Buildroot will automatically look in the "configs" subfolder 
-# for the specified default configuration file.  Buildroot will 
-# remember this tree exists, so you don't have to tell it each 
+# Buildroot will automatically look in the "configs" subfolder
+# for the specified default configuration file.  Buildroot will
+# remember this tree exists, so you don't have to tell it each
 # time you call make.
 echo "Adding this tree to buildroot for board: $board..."
 cd $buildroot_dir
@@ -179,9 +179,3 @@ make $buildroot_make_args
 ### End tidily ###
 ##################
 echo "Done setting up"
-
-
-
-
-
-
