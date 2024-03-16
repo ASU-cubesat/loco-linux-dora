@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+
+# Only do this on boot
+if [ "$1" == "stop" ] || [ "$1" == "restart" ]; then
+    exit
+fi
+
+boot_file_name='/home/dora/logs/boot_count.bin'
+
+if test -f $boot_file_name; then
+    # File exists, incremenet
+    VAR=`cat $boot_file_name`
+    echo $(($VAR + 1 )) > $boot_file_name
+else
+    # File does not exist, create it and write a 0 to it
+    touch $boot_file_name
+    echo 0 > $boot_file_name
+fi

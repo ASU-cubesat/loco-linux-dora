@@ -12,6 +12,9 @@ sysfs		/sys		sysfs	defaults	0	0
 /dev/mmcblk0p3  /upgrade            ext4    defaults               0       0
 /dev/mmcblk0p4  /home               ext4    defaults               0       2
 
+# Define mount point for sdcard
+UUID=9f560169-0d49-4d5d-835e-387f5c3af67b    /media/sdcard    ext4    defaults    0    0
+
 # Define but don't mount points for both mmc0 and mmc1 partitions
 /dev/mmcblk0p1	/mnt/mmc0/boot      vfat    defaults,noauto        0       0
 /dev/mmcblk0p2  /mnt/mmc0           ext4    defaults,noauto        0       0
