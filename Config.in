@@ -1,0 +1,3 @@
+menu "ASU Linux"
+    source "$BR2_EXTERNAL_ASU_LINUX_PATH/package/dora/Config.in"
+endmenu
