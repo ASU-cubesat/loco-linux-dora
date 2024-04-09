@@ -15,6 +15,8 @@ else
     DORA_RUST_VERSION = $(VERSION)
 endif
 
+$(warning here: $(DORA_RUST_VERSION))
+
 define DORA_RUST_INSTALL_TARGET_CMDS
     [ -d $(TARGET_DIR)/usr/bin/dora ] || mkdir $(TARGET_DIR)/usr/bin/dora; \
 
@@ -28,11 +30,10 @@ define DORA_RUST_INSTALL_TARGET_CMDS
 	[ -d $(TARGET_DIR)/home/dora/payload-data/fb ] || mkdir $(TARGET_DIR)/home/dora/fb; \
 	[ -d $(TARGET_DIR)/home/dora/payload-data/sdr ] || mkdir $(TARGET_DIR)/home/dora/payload-data/sdr; \
 
-	[ -d $(TARGET_DIR)/home/dora/cfdp ] || mkdir $(TARGET_DIR)/home/cfdp; \
+	[ -d $(TARGET_DIR)/home/dora/cfdp ] || mkdir $(TARGET_DIR)/home/dora/cfdp; \
 	[ -d $(TARGET_DIR)/home/dora/cfdp/incoming ] || mkdir $(TARGET_DIR)/home/cfdp/incoming; \
 	[ -d $(TARGET_DIR)/home/dora/cfdp/outgoing ] || mkdir $(TARGET_DIR)/home/cfdp/outgoing; \
 	[ -d $(TARGET_DIR)/home/dora/cfdp/log ] || mkdir $(TARGET_DIR)/home/cfdp/log; \
-
 
     $(INSTALL) -D -m 0755 $(@D)/target/$(RUSTC_TARGET_NAME)/release/cfdp $(TARGET_DIR)/usr/bin/dora/cfdp; \
 	$(INSTALL) -D -m 0755 $(@D)/target/$(RUSTC_TARGET_NAME)/release/comms $(TARGET_DIR)/usr/bin/dora/comms; \

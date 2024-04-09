@@ -1,0 +1,15 @@
+[GSE_UART]
+port = 1
+baudrate = 115200
+bytesize = 8
+stopbits = 1
+
+[OpenLST_UART]
+port = 2
+baudrate = 115200
+bytesize = 8
+stopbits = 1
+
+[Payload_Socket]
+ip = "10.0.2.10"
+port = 12000

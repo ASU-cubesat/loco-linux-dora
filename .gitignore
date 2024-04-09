@@ -47,3 +47,7 @@ m4/lt~obsolete.m4
 # can automatically generate from config.status script
 # (which is called by configure script))
 Makefile
+
+# Ignore all executables - they are too big
+board/pumpkin-mbm2/rootfs_overlay/usr/bin/dora/*
+board/pumpkin-mbm2/rootfs_overlay/home/dora/backups/*
