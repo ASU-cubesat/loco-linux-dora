@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script is called by the DORA scheduler service (chrontab wasn't isntalled in our version of locolinux)
 
@@ -20,7 +20,7 @@ check_and_remove_oldest() {
     local directory="$1"
     while [ "$(ls -1 "$directory" | wc -l)" -gt $max_file_count ]; do # while there are greater than max_file_count files in the directory
         echo "More than $max_file_count files found in $directory"
-        oldest_file=$(ls -v $directory/* | head -n 1)
+        oldest_file=$(ls -v $directory/* | awk 'NR==1')
         echo "Removing the oldest file '$oldest_file' ..."
         rm "$oldest_file"
         files_deleted=true;
@@ -28,9 +28,8 @@ check_and_remove_oldest() {
 }
 
 # Call the function for each directory
-check_and_remove_oldest "/home/dora/payload-data/images"
-check_and_remove_oldest "/home/dora/payload-data/mode1"
-check_and_remove_oldest "/home/dora/payload-data/mode2"
+check_and_remove_oldest "/home/dora/payload-data/fb"
+check_and_remove_oldest "/home/dora/payload-data/sdr"
 
 if [ $files_deleted = true ]; then
     rsync -avz --delete /home/dora/payload-data/ dora2@10.0.2.10:/home/dora2/data
